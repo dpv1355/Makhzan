@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101827">
+<meta name="description" content="خزانه امن شخصی آفلاین">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<title>خزانه امن شخصی</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#121d2e;--panel2:#19263a;--text:#edf3fb;--muted:#9eacc0;--line:#2b3a50;--accent:#5ca8ff;--danger:#ff7272;--good:#52d6a0}
+[data-theme="light"]{color-scheme:light;--bg:#f3f6fb;--panel:#fff;--panel2:#edf2f8;--text:#182438;--muted:#627188;--line:#d9e1ec;--accent:#176bd1;--danger:#c93636;--good:#16885d}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Tahoma,"Segoe UI",sans-serif;font-size:14px;line-height:1.7}
+button,input,textarea,select{font:inherit}button{cursor:pointer;border:0;border-radius:11px;padding:10px 14px;background:var(--accent);color:white;font-weight:700}button.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}button.danger{background:#a92f3a}button:disabled{opacity:.45;cursor:not-allowed}
+.wrap{max-width:980px;margin:auto;padding:18px 14px 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}.brand{display:flex;gap:12px;align-items:center}.logo{width:44px;height:44px;border-radius:14px;background:linear-gradient(145deg,#3f93ef,#745de6);display:grid;place-items:center;font-size:22px}.brand h1{font-size:18px;margin:0}.brand small{color:var(--muted)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:17px;margin:12px 0;box-shadow:0 8px 30px #00000012}.center{max-width:480px;margin:8vh auto}.hidden{display:none!important}.muted{color:var(--muted)}.small{font-size:12px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}.tile{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:right;color:var(--text)}.tile b{display:block;font-size:17px}.tile span{color:var(--muted);font-size:12px}
+label{display:block;margin:10px 0 5px;color:var(--muted)}input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--text);padding:11px;outline:none}textarea{min-height:95px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--accent)}
+.nav{display:flex;gap:7px;overflow:auto;padding:4px 0 10px}.nav button{white-space:nowrap}.nav button.active{background:#2769b5}.item{padding:13px;border:1px solid var(--line);border-radius:13px;margin:9px 0;background:var(--panel2);display:flex;justify-content:space-between;gap:10px;align-items:center}.item strong{display:block}.item small{color:var(--muted)}.item .actions{display:flex;gap:6px;flex-wrap:wrap}.item button{padding:7px 10px;font-size:12px}
+.notice{border:1px solid #a87c2e;background:#a87c2e18;border-radius:12px;padding:12px;color:var(--text);font-size:12px}.status{font-size:12px;color:var(--good);min-height:22px}.sectionhead{display:flex;justify-content:space-between;align-items:center;gap:10px}.sectionhead h2{font-size:17px;margin:5px 0}.filepreview{max-width:100%;max-height:240px;border-radius:10px}.footer{color:var(--muted);font-size:11px;text-align:center;margin-top:25px}
+@media(max-width:560px){.wrap{padding:12px 10px 30px}.top{align-items:flex-start}.top .row{justify-content:flex-end}.card{padding:14px}.item{align-items:flex-start;flex-direction:column}.item .actions{width:100%}.item .actions button{flex:1}}
+ 
+.folder-chip{background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:7px 11px;border-radius:999px}.folder-chip.active{background:#2769b5;color:#fff}.preview-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:10px;margin-top:12px}
+.photo-card{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:7px;min-width:0}
+.photo-card img{width:100%;height:105px;object-fit:cover;border-radius:8px;display:block;background:var(--bg)}
+.photo-card .photo-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:5px 2px}
+.modal{position:fixed;inset:0;background:#000d;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;max-width:700px;width:100%;max-height:90vh;overflow:auto}
+.modal-box img{max-width:100%;max-height:65vh;display:block;margin:auto;border-radius:10px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:520px){.field-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+ <div class="brand"><div class="logo">🔐</div><div><h1>خزانه امن شخصی</h1><small>نسخه ۲ · خزانه آفلاین</small></div></div>
+ <div class="row"><button class="secondary" id="installBtn" hidden>نصب برنامه</button><button class="secondary" id="themeBtn">☼ پوسته</button></div>
+</header>
+
+<section id="setup" class="card center hidden">
+ <h2>ساخت خزانه جدید</h2>
+ <p class="muted">یک رمز اصلی قوی انتخاب کن. این رمز برای رمزگشایی اطلاعات لازم است و بازیابی آن ممکن نیست.</p>
+ <label>رمز اصلی</label><input id="newPass" type="password" autocomplete="new-password" minlength="10" placeholder="حداقل ۱۰ نویسه">
+ <label>تکرار رمز اصلی</label><input id="newPass2" type="password" autocomplete="new-password">
+ <div class="notice">رمز را در جای امن و جدا از گوشی نگهداری کن. اگر آن را فراموش کنی و نسخه پشتیبان رمزگشایی‌پذیر نداشته باشی، اطلاعات قابل بازیابی نیست.</div>
+ <p id="setupMsg" class="status"></p><button id="createBtn" style="width:100%">ساخت خزانه</button>
+</section>
+
+<section id="unlock" class="card center hidden">
+ <h2>باز کردن خزانه</h2><p class="muted">برای دسترسی به اطلاعات، رمز اصلی را وارد کن.</p>
+ <label>رمز اصلی</label><input id="pass" type="password" autocomplete="current-password">
+ <p id="unlockMsg" class="status"></p><button id="unlockBtn" style="width:100%">باز کردن با رمز اصلی</button><button id="bioUnlockBtn" class="secondary" style="width:100%;margin-top:8px" hidden>ورود با اثر انگشت</button>
+</section>
+
+<main id="app" class="hidden">
+ <div class="card">
+  <div class="sectionhead"><div><h2>خزانه من</h2><span class="muted small">اطلاعات در همین مرورگر و روی همین مبدأ ذخیره می‌شود. اثر انگشت فقط در صورت پشتیبانی WebAuthn PRF فعال خواهد شد.</span></div><div class="row"><button class="secondary" id="biometricBtn">فعال‌سازی اثر انگشت</button><button class="secondary" id="lockBtn">قفل خزانه</button></div></div>
+  <div class="grid" style="margin-top:14px">
+   <div class="tile"><b id="countAll">۰</b><span>مورد ذخیره‌شده</span></div>
+   <div class="tile"><b>AES‑GCM</b><span>رمزنگاری محتوای داده‌ها</span></div>
+   <div class="tile"><b>محلی</b><span>بدون ارسال به سرور</span></div>
+  </div>
+ </div>
+ <nav class="nav">
+  <button class="active" data-tab="all">همه موارد</button><button data-tab="login">🔑 رمزها</button><button data-tab="bank">💳 بانکی</button><button data-tab="note">📝 یادداشت</button><button data-tab="file">📁 عکس و مدارک</button><button data-tab="backup">🛡 پشتیبان</button>
+ </nav>
+ <section id="listPanel" class="card">
+  <div class="sectionhead"><h2 id="listTitle">همه موارد</h2><button id="addBtn">＋ افزودن</button></div>
+  <div id="folderBar" class="row" style="margin:10px 0"></div><div id="items"></div><p id="empty" class="muted">هنوز موردی ثبت نشده است.</p>
+ </section>
+ <section id="backupPanel" class="card hidden">
+  <h2>پشتیبان‌گیری و بازیابی</h2>
+  <p>فایل پشتیبان شامل داده‌های رمزنگاری‌شده است. برای بازیابی، رمز اصلی لازم است. نسخه فعلی از AES-256-GCM و PBKDF2-HMAC-SHA-256 با ۶۰۰٬۰۰۰ تکرار استفاده می‌کند؛ Argon2id هنوز در این نسخه پیاده‌سازی نشده است.</p>
+  <div class="row"><button id="exportBtn">ساخت فایل پشتیبان</button><button class="secondary" id="importBtn">بازیابی از فایل</button><input type="file" id="backupFile" accept=".vault,application/json" class="hidden"></div>
+  <p id="backupMsg" class="status"></p>
+  <div class="notice">فایل پشتیبان را در فضای ابری دلخواه، کامپیوتر یا فلش نگهداری کن. برای اطمینان، هر چند وقت یک‌بار بازیابی آن را روی یک مرورگر/دستگاه آزمایشی بررسی کن. خروجی نسخه اول، پشتیبان کامل رمزنگاری‌شده است؛ همگام‌سازی خودکار ابری وجود ندارد.</div>
+ </section>
+ <section id="editor" class="card hidden">
+  <div class="sectionhead"><h2 id="editorTitle">افزودن مورد</h2><button class="secondary" id="cancelEdit">بستن</button></div>
+  <input type="hidden" id="editId">
+  <label id="kindLabel">نوع اطلاعات</label><select id="kind"><option value="login">نام کاربری و رمز عبور</option><option value="bank">اطلاعات بانکی</option><option value="note">یادداشت محرمانه</option><option value="file">عکس و مدرک</option></select>
+  <label>عنوان</label><input id="title" placeholder="مثلاً ایمیل شخصی یا گذرنامه">
+  <div id="loginFields"><label>نام کاربری</label><input id="username"><label>رمز عبور</label><input id="secret" type="password"><label>آدرس سایت (اختیاری)</label><input id="url" inputmode="url"></div>
+  <div id="bankFields" class="hidden">
+   <label>نام بانک</label><input id="bankName">
+   <label>شماره کارت</label><input id="cardNo" inputmode="numeric" autocomplete="off">
+   <label>شماره شبا (IR...)</label><input id="iban" inputmode="text" autocomplete="off">
+   <div class="field-row"><div><label>تاریخ انقضا (ماه/سال)</label><input id="expiry" placeholder="مثلاً 08/28"></div><div><label>CVV2 (اختیاری)</label><input id="cvv2" type="password" inputmode="numeric" autocomplete="off" placeholder="مخفی"></div></div>
+   <label>نام دارنده کارت</label><input id="bankExtra">
+   <p class="notice">ذخیره CVV2 ریسک امنیتی دارد. این فیلد اختیاری و به‌صورت مخفی است؛ از ذخیره آن خودداری کن مگر اینکه ریسک را پذیرفته باشی.</p>
+  </div>
+  <div id="noteFields" class="hidden"><label>متن محرمانه</label><textarea id="body"></textarea></div>
+  <div id="fileFields" class="hidden"><label>پوشه نگهداری</label><select id="folderSelect"><option value="Private">Private 🔒</option><option value="عمومی">عمومی</option></select><div class="row"><input id="newFolderName" placeholder="نام پوشه جدید"><button type="button" class="secondary" id="addFolderBtn">ساخت پوشه</button></div><label>انتخاب تصویر یا فایل</label><input id="fileInput" type="file" accept="image/*,.pdf,.txt"><small class="muted">فایل قبل از ذخیره‌سازی رمزنگاری می‌شود. سقف پیشنهادی هر فایل ۱۵ مگابایت است.</small>
+  <label style="display:flex;align-items:center;gap:8px;margin-top:12px"><input id="secureMove" type="checkbox" style="width:auto"> انتقال امن: پس از ذخیره موفق، برای حذف فایل اصلی اقدام کن</label>
+  <button type="button" id="pickSourceFolder" class="secondary">انتخاب پوشه مبدأ برای حذف فایل اصلی</button>
+  <div id="moveInfo" class="small muted">در حالت عادی فقط نسخه رمزنگاری‌شده ذخیره می‌شود و فایل اصلی باقی می‌ماند. حذف از گالری در همه مرورگرهای اندروید پشتیبانی نمی‌شود.</div>
+  <div id="fileInfo" class="small muted"></div><div id="filePreview"></div></div>
+  <label>برچسب یا توضیحات (اختیاری)</label><textarea id="description" style="min-height:65px"></textarea>
+  <p id="editMsg" class="status"></p><button id="saveBtn">ذخیره رمزنگاری‌شده</button>
+ </section>
+</main>
+<div id="privateGate" class="modal hidden"><div class="modal-box"><h2>باز کردن پوشه Private 🔒</h2><p class="muted">ابتدا تأیید هویت دستگاه و سپس رمز اختصاصی پوشه را وارد کن.</p><button id="privateBioBtn" style="width:100%">۱. تأیید هویت با اثر انگشت / قفل دستگاه</button><label>۲. رمز اختصاصی پوشه Private</label><input id="privatePass" type="password" autocomplete="current-password"><p id="privateMsg" class="status"></p><div class="row"><button id="privateOpenBtn">باز کردن پوشه</button><button class="secondary" id="privateCancelBtn">انصراف</button></div></div></div>
+<div id="photoModal" class="modal hidden"><div class="modal-box"><div class="sectionhead"><strong id="photoModalTitle">پیش‌نمایش</strong><button class="secondary" id="closePhoto">بستن</button></div><img id="photoModalImg" alt="پیش‌نمایش تصویر"><div class="row" style="justify-content:center;margin-top:12px"><button id="downloadPhoto">دانلود تصویر</button></div></div></div>
+<div class="footer">نسخه ۲.۴ · ورود با اثر انگشت در شروع برنامه · انتقال امن با تلاش برای حذف فایل اصلی در مرورگرهای سازگار · پوشه Private دارای رمزگذاری جداگانه فایل و تأیید هویت دستگاه + رمز اختصاصی است. پشتیبان رمزنگاری‌شده را جداگانه نگهداری کن. برای نصب PWA و WebAuthn باید روی HTTPS میزبانی شود.</div>
+</div>
+<script>
+(()=>{"use strict";
+const $=id=>document.getElementById(id), DB="personal-vault-v1", STORE="records", META="meta";
+let db, masterKey=null, salt=null, sourceDirectoryHandle=null, activeTab="all", records=[], selectedFolder="همه", folderNames=["Private","عمومی"], privateKey=null, privateBioOk=false;
+const enc=new TextEncoder(), dec=new TextDecoder();
+function b64(buf){let s="";new Uint8Array(buf).forEach(b=>s+=String.fromCharCode(b));return btoa(s)}
+function unb64(s){let x=atob(s),a=new Uint8Array(x.length);for(let i=0;i<x.length;i++)a[i]=x.charCodeAt(i);return a.buffer}
+function rand(n){return crypto.getRandomValues(new Uint8Array(n))}
+function openDB(){return new Promise((resolve,reject)=>{let r=indexedDB.open(DB,1);r.onupgradeneeded=()=>{let d=r.result;if(!d.objectStoreNames.contains(STORE))d.createObjectStore(STORE,{keyPath:"id"});if(!d.objectStoreNames.contains(META))d.createObjectStore(META,{keyPath:"key"})};r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)})}
+function req(tx,store,method,arg){return new Promise((res,rej)=>{let r=tx.objectStore(store)[method](arg);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function getMeta(key){let tx=db.transaction(META,"readonly");return req(tx,META,"get",key)}
+async function putMeta(key,value){let tx=db.transaction(META,"readwrite");return req(tx,META,"put",{key,value})}
+async function derive(password,s){const material=await crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"PBKDF2",salt:s,iterations:600000,hash:"SHA-256"},material,{name:"AES-GCM",length:256},true,["encrypt","decrypt"])}
+async function encryptBytes(bytes){let iv=rand(12),ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},masterKey,bytes);return {iv:b64(iv),data:b64(ct)}}
+async function decryptBytes(obj){return crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(unb64(obj.iv))},masterKey,unb64(obj.data))}
+async function sealObject(o){return encryptBytes(enc.encode(JSON.stringify(o)))}
+async function unsealObject(o){return JSON.parse(dec.decode(await decryptBytes(o)))}
+function show(id){$(id).classList.remove("hidden")}function hide(id){$(id).classList.add("hidden")}
+function msg(id,t){$(id).textContent=t}
+function resetEditor(){sourceDirectoryHandle=null;$("secureMove").checked=false;$("moveInfo").textContent="در حالت عادی فقط نسخه رمزنگاری‌شده ذخیره می‌شود و فایل اصلی باقی می‌ماند. حذف از گالری در همه مرورگرهای اندروید پشتیبانی نمی‌شود.";["editId","title","username","secret","url","bankName","cardNo","iban","expiry","cvv2","bankExtra","body","description"].forEach(x=>$(x).value="");$("fileInput").value="";$("fileInfo").textContent="";$("filePreview").innerHTML="";let k=["login","bank","note","file"].includes(activeTab)?activeTab:"login";$("kind").value=k;updateFields();hide("editor")}
+function updateFields(){let k=$("kind").value;["login","bank","note","file"].forEach(x=>$(x+"Fields").classList.toggle("hidden",k!==x))}
+async function loadRecords(){let fm=await getMeta("folders");if(fm&&Array.isArray(fm.value)){folderNames=["Private","عمومی",...fm.value.filter(x=>!["Private","عمومی"].includes(x))];$("folderSelect").innerHTML="";folderNames.forEach(n=>$("folderSelect").add(new Option(n,n)))}let tx=db.transaction(STORE,"readonly");let rows=await req(tx,STORE,"getAll");records=[];for(let r of rows){try{records.push({id:r.id,...await unsealObject(r.payload)})}catch(e){console.error("bad record",r.id)}}$("countAll").textContent=records.length.toLocaleString("fa-IR");render()}
+function labelKind(k){return {login:"رمز و حساب",bank:"بانکی",note:"یادداشت",file:"فایل"}[k]||k}
+function render(){
+ let filtered=activeTab==="file"?records.filter(r=>r.kind==="file"):activeTab==="all"?records:records.filter(r=>r.kind===activeTab);
+ if(!privateKey)filtered=filtered.filter(r=>r.folder!=="Private");
+ if(activeTab==="file"){
+  $("folderBar").classList.remove("hidden");$("folderBar").innerHTML="";
+  ["همه",...folderNames].forEach(name=>{let b=document.createElement("button");b.className="folder-chip"+(selectedFolder===name?" active":"");b.textContent=name==="Private"?"🔒 Private":name;b.onclick=()=>{if(name==="Private"){requestPrivateGate()}else{selectedFolder=name;privateKey=null;privateBioOk=false;render()}};$("folderBar").append(b)});
+  if(selectedFolder!=="همه")filtered=filtered.filter(r=>(r.folder||"Private")===selectedFolder);
+  if(selectedFolder==="Private"&&!privateKey){$("items").innerHTML="";$("empty").classList.add("hidden");return}
+ }else{$("folderBar").classList.add("hidden")}
+ $("items").innerHTML="";$("empty").classList.toggle("hidden",filtered.length>0);
+ for(let r of filtered){let div=document.createElement("div");div.className="item";let info=document.createElement("div"),strong=document.createElement("strong"),small=document.createElement("small");strong.textContent=r.title||"بدون عنوان";small.textContent=labelKind(r.kind)+" · "+(r.folder||"")+" · "+(r.description||"");info.append(strong,small);
+ if(r.kind==="file"&&(r.mime||"").startsWith("image/")){let thumb=document.createElement("img");thumb.alt="پیش‌نمایش "+(r.fileName||"تصویر");thumb.className="filepreview";thumb.style.maxWidth="110px";thumb.style.maxHeight="90px";thumb.style.objectFit="cover";try{if(!r.privateFile){let bin=Uint8Array.from(atob(r.fileData),c=>c.charCodeAt(0));let u=URL.createObjectURL(new Blob([bin],{type:r.mime}));thumb.src=u;thumb.onload=()=>URL.revokeObjectURL(u)}else if(privateKey){fileBlob(r).then(blob=>{let u=URL.createObjectURL(blob);thumb.src=u;thumb.onload=()=>URL.revokeObjectURL(u)})}}catch(e){}info.append(thumb)}
+ let actions=document.createElement("div");actions.className="actions";let view=document.createElement("button");view.className="secondary";view.textContent="نمایش";view.onclick=()=>viewRecord(r.id);let edit=document.createElement("button");edit.className="secondary";edit.textContent="ویرایش";edit.onclick=()=>editRecord(r.id);let del=document.createElement("button");del.className="danger";del.textContent="حذف";del.onclick=()=>deleteRecord(r.id);actions.append(view,edit,del);div.append(info,actions);$("items").append(div)}
+}
+async function requestPrivateGate(){show("privateGate");$("privatePass").value="";msg("privateMsg","برای دیدن محتویات Private هر دو مرحله لازم است.");privateBioOk=false}
+async function verifyPrivateBiometric(){
+ try{let b=await getMeta("biometric");if(!b)throw Error("ابتدا اثر انگشت را از صفحه اصلی خزانه فعال کن.");await navigator.credentials.get({publicKey:{challenge:rand(32),allowCredentials:[{type:"public-key",id:new Uint8Array(unb64(b.value.credentialId))}],userVerification:"required",timeout:60000}});privateBioOk=true;msg("privateMsg","تأیید هویت دستگاه انجام شد؛ اکنون رمز اختصاصی پوشه را وارد کن.");}
+ catch(e){privateBioOk=false;msg("privateMsg","تأیید هویت انجام نشد: "+e.message)}
+}
+async function setupOrOpenPrivate(){
+ try{
+  if(!privateBioOk)throw Error("ابتدا تأیید هویت دستگاه را انجام بده.");
+  let password=$("privatePass").value;if(password.length<10)throw Error("رمز اختصاصی باید حداقل ۱۰ نویسه داشته باشد.");
+  let m=await getMeta("privateVault");
+  if(!m){if(!confirm("برای پوشه Private هنوز رمز اختصاصی ساخته نشده است. همین رمز را به‌عنوان رمز جدید ثبت کنم؟"))return;let ps=rand(16),k=await derive(password,ps),check=await encryptWithKey(k,enc.encode("private-ok-v1"));await putMeta("privateVault",{salt:b64(ps),check});privateKey=k;}
+  else{let ps=new Uint8Array(unb64(m.value.salt)),k=await derive(password,ps);let ok=await decryptWithKey(k,m.value.check);if(dec.decode(ok)!=="private-ok-v1")throw Error("رمز اختصاصی اشتباه است.");privateKey=k;}
+  selectedFolder="Private";hide("privateGate");render();
+ }catch(e){msg("privateMsg",e.message)}
+}
+async function encryptWithKey(key,bytes){let iv=rand(12),data=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,bytes);return {iv:b64(iv),data:b64(data)}}
+async function decryptWithKey(key,obj){return crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(unb64(obj.iv))},key,unb64(obj.data))}
+async function tryRemoveOriginal(dir,meta){try{if(!dir||!meta)return "نسخه رمزنگاری‌شده ذخیره شد؛ فایل اصلی حذف نشد چون پوشه مبدأ مشخص نبود.";let perm=await dir.queryPermission({mode:"readwrite"});if(perm!=="granted")perm=await dir.requestPermission({mode:"readwrite"});if(perm!=="granted")return "نسخه رمزنگاری‌شده ذخیره شد؛ مجوز حذف فایل اصلی داده نشد و فایل اصلی باقی ماند.";let h;try{h=await dir.getFileHandle(meta.name)}catch(e){return "نسخه رمزنگاری‌شده ذخیره شد؛ فایل هم‌نام در پوشه انتخاب‌شده پیدا نشد و فایل اصلی حذف نشد."}let f=await h.getFile();if(f.size!==meta.size||f.lastModified!==meta.lastModified||((meta.type||"")&&(f.type||"")!==meta.type))return "نسخه رمزنگاری‌شده ذخیره شد؛ مشخصات فایل با فایل انتخاب‌شده یکسان نبود، بنابراین برای جلوگیری از حذف فایل اشتباه، فایل اصلی حذف نشد.";if(!confirm("نسخه رمزنگاری‌شده با موفقیت ذخیره شد. آیا مطمئنی فایل اصلی «"+meta.name+"» از پوشه انتخاب‌شده حذف شود؟"))return "نسخه رمزنگاری‌شده ذخیره شد؛ بنا به انتخاب شما فایل اصلی باقی ماند.";await dir.removeEntry(meta.name);return "انتقال امن انجام شد: نسخه رمزنگاری‌شده ذخیره و فایل اصلی از پوشه انتخاب‌شده حذف شد. سطل زباله یا نسخه‌های ابری ممکن است همچنان کپی داشته باشند."}catch(e){return "نسخه رمزنگاری‌شده ذخیره شد، اما حذف فایل اصلی انجام نشد: "+e.message+". فایل اصلی را دستی بررسی کن."}}
+async function saveRecord(){try{let id=$("editId").value||crypto.randomUUID(),kind=$("kind").value,title=$("title").value.trim();if(!title){msg("editMsg","عنوان را وارد کن.");return}let moveRequested=$("secureMove").checked, selectedFile=$("fileInput").files[0], sourceMeta=selectedFile?{name:selectedFile.name,size:selectedFile.size,lastModified:selectedFile.lastModified,type:selectedFile.type}:null; if(moveRequested&&kind==="file"&&!selectedFile&&!$("editId").value){msg("editMsg","برای انتقال امن ابتدا فایل را انتخاب کن.");return} if(moveRequested&&kind==="file"&&selectedFile&&!sourceDirectoryHandle){msg("editMsg","ابتدا پوشه مبدأ را انتخاب کن یا حالت انتقال امن را غیرفعال کن.");return} let o={kind,title,description:$("description").value,updated:new Date().toISOString()};if(kind==="login")Object.assign(o,{username:$("username").value,secret:$("secret").value,url:$("url").value});if(kind==="bank")Object.assign(o,{bankName:$("bankName").value,cardNo:$("cardNo").value,iban:$("iban").value,expiry:$("expiry").value,cvv2:$("cvv2").value,bankExtra:$("bankExtra").value});if(kind==="note")o.body=$("body").value;if(kind==="file"){o.folder=$("folderSelect").value||"Private";let f=$("fileInput").files[0];if(f){if(f.size>15*1024*1024){msg("editMsg","فایل بزرگ‌تر از ۱۵ مگابایت است.");return}o.fileName=f.name;o.mime=f.type||"application/octet-stream";let raw=await f.arrayBuffer();if(o.folder==="Private"){if(!privateKey){msg("editMsg","برای افزودن به Private ابتدا پوشه را با اثر انگشت و رمز اختصاصی باز کن.");return}o.privateFile=true;o.fileData=await encryptWithKey(privateKey,raw)}else{o.privateFile=false;o.fileData=b64(raw)}}else if($("editId").value){let old=records.find(x=>x.id===$("editId").value);if(old){o.fileName=old.fileName;o.mime=old.mime;o.fileData=old.fileData;o.folder=old.folder||"Private";o.privateFile=!!old.privateFile}}else{msg("editMsg","یک فایل انتخاب کن.");return}}
+let payload=await sealObject(o),tx=db.transaction(STORE,"readwrite");await req(tx,STORE,"put",{id,payload});await loadRecords();let moveMessage="";if(moveRequested&&kind==="file"&&selectedFile){moveMessage=await tryRemoveOriginal(sourceDirectoryHandle,sourceMeta)}let savedKind=kind;resetEditor();if(["login","bank","note","file"].includes(activeTab))$("kind").value=activeTab;else $("kind").value=savedKind;updateFields();if(moveMessage)alert(moveMessage);msg("editMsg","");}catch(e){msg("editMsg","ذخیره انجام نشد: "+e.message)}}
+async function viewRecord(id){let r=records.find(x=>x.id===id);if(!r)return;if(r.folder==="Private"&&!privateKey){await requestPrivateGate();return}let lines=["عنوان: "+r.title,"نوع: "+labelKind(r.kind)];if(r.kind==="login")lines.push("نام کاربری: "+r.username,"رمز: "+r.secret,"نشانی: "+r.url);if(r.kind==="bank")lines.push("بانک: "+r.bankName,"شماره کارت: "+r.cardNo,"شبا: "+r.iban,"انقضا: "+r.expiry,"CVV2: "+(r.cvv2||"ثبت نشده"),"دارنده: "+r.bankExtra);if(r.kind==="note")lines.push(r.body);if(r.kind==="file"){if((r.mime||"").startsWith("image/")){openPhoto(r);return}downloadRecordFile(r);return}lines.push("توضیحات: "+r.description);alert(lines.join("\n"))}
+let currentPhotoUrl=null,currentPhotoRecord=null;
+async function fileBlob(r){let bytes=r.privateFile?await decryptWithKey(privateKey,r.fileData):unb64(r.fileData);return new Blob([bytes],{type:r.mime||"application/octet-stream"})}
+async function downloadRecordFile(r){let url=URL.createObjectURL(await fileBlob(r)),a=document.createElement("a");a.href=url;a.download=r.fileName||"vault-file";a.click();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+async function openPhoto(r){currentPhotoRecord=r;if(currentPhotoUrl)URL.revokeObjectURL(currentPhotoUrl);currentPhotoUrl=URL.createObjectURL(await fileBlob(r));$("photoModalImg").src=currentPhotoUrl;$("photoModalTitle").textContent=r.fileName||r.title;show("photoModal")}
+function closePhoto(){hide("photoModal");$("photoModalImg").removeAttribute("src");if(currentPhotoUrl)URL.revokeObjectURL(currentPhotoUrl);currentPhotoUrl=null;currentPhotoRecord=null}
+function editRecord(id){let r=records.find(x=>x.id===id);if(!r)return;if(r.folder==="Private"&&!privateKey){requestPrivateGate();return}resetEditor();$("editId").value=id;$("kind").value=r.kind;$("kind").classList.remove("hidden");$("kindLabel").classList.remove("hidden");updateFields();$("title").value=r.title;$("description").value=r.description||"";if(r.kind==="login"){ $("username").value=r.username||"";$("secret").value=r.secret||"";$("url").value=r.url||""}if(r.kind==="bank"){$("bankName").value=r.bankName||"";$("cardNo").value=r.cardNo||"";$("iban").value=r.iban||"";$("expiry").value=r.expiry||"";$("cvv2").value=r.cvv2||"";$("bankExtra").value=r.bankExtra||""}if(r.kind==="note")$("body").value=r.body||"";if(r.kind==="file"){$("fileInfo").textContent="فایل فعلی: "+r.fileName+" (برای جایگزینی فایل جدید انتخاب کن)";$("folderSelect").value=r.folder||"Private"}$("editorTitle").textContent="ویرایش مورد";show("editor");window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})}
+async function deleteRecord(id){if(!confirm("این مورد برای همیشه حذف شود؟"))return;let tx=db.transaction(STORE,"readwrite");await req(tx,STORE,"delete",id);await loadRecords()}
+function setTab(t){activeTab=t;if(t==="file")selectedFolder="همه";document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.tab===t));$("listTitle").textContent=({all:"همه موارد",login:"رمزها",bank:"اطلاعات بانکی",note:"یادداشت‌ها",file:"عکس و مدارک",backup:"پشتیبان‌گیری"})[t];if(t==="backup"){hide("listPanel");show("backupPanel")}else{show("listPanel");hide("backupPanel");render()}}
+
+async function deriveWrapKey(prfBytes, saltBytes){let base=await crypto.subtle.importKey("raw",prfBytes,"HKDF",false,["deriveKey"]);return crypto.subtle.deriveKey({name:"HKDF",hash:"SHA-256",salt:saltBytes,info:enc.encode("PersonalVault biometric wrap v1")},base,{name:"AES-GCM",length:256},false,["encrypt","decrypt"])}
+async function biometricEnroll(){
+ try{
+  if(!window.PublicKeyCredential||!navigator.credentials||!crypto.subtle)throw Error("مرورگر از WebAuthn پشتیبانی نمی‌کند.");
+  let meta=await getMeta("vault");if(!meta||!masterKey)throw Error("ابتدا خزانه را باز کن.");
+  let prfSalt=rand(32);
+  // Do not force a particular authenticator attachment: synced platform passkeys
+  // may be exposed differently by Android/Chrome. Request PRF evaluation at create,
+  // then fall back to a fresh assertion if the create response has no result.
+  let credential=await navigator.credentials.create({publicKey:{challenge:rand(32),rp:{name:"Personal Vault",id:location.hostname},user:{id:rand(16),name:"vault-user",displayName:"Vault User"},pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{residentKey:"required",requireResidentKey:true,userVerification:"required"},timeout:60000,attestation:"none",extensions:{prf:{eval:{first:prfSalt}}}}});
+  let createExt=credential.getClientExtensionResults(),prf=createExt.prf&&createExt.prf.results&&createExt.prf.results.first;
+  if(!createExt.prf||createExt.prf.enabled!==true)throw Error("مرورگر/احرازکننده در این مبدأ، PRF را برای Passkey جدید فعال نکرد. اگر در آزمایشگاه PRF فعال بود، مطمئن شو همین Chrome و همان پروفایل کاربری را استفاده می‌کنی.");
+  if(!prf){
+   let assertion=await navigator.credentials.get({publicKey:{challenge:rand(32),allowCredentials:[{type:"public-key",id:new Uint8Array(credential.rawId)}],userVerification:"required",timeout:60000,extensions:{prf:{eval:{first:prfSalt}}}}});
+   let ext=assertion.getClientExtensionResults();prf=ext.prf&&ext.prf.results&&ext.prf.results.first;
+  }
+  if(!prf)throw Error("PRF فعال گزارش شد، اما خروجی ارزیابی دریافت نشد. ثبت اثر انگشت کامل نشد؛ رمز اصلی همچنان قابل استفاده است.");
+  let rawKey=await crypto.subtle.exportKey("raw",masterKey);
+  // The credential PRF result is credential-specific; use it to wrap the vault key.
+  let wrap=await deriveWrapKey(prf,prfSalt),iv=rand(12),wrapped=await crypto.subtle.encrypt({name:"AES-GCM",iv},wrap,rawKey);
+  await putMeta("biometric",{credentialId:b64(credential.rawId),prfSalt:b64(prfSalt),iv:b64(iv),wrapped:b64(wrapped)});
+  $("bioUnlockBtn").hidden=false;alert("اثر انگشت برای همین دستگاه و همین مبدأ ثبت شد. ابتدا قفل کن و ورود با اثر انگشت را آزمایش کن.");
+ }catch(e){alert("فعال‌سازی اثر انگشت انجام نشد: "+e.message)}
+}
+async function biometricUnlock(){
+ try{
+  let b=await getMeta("biometric");if(!b)throw Error("اثر انگشت هنوز فعال نشده است.");
+  let cred=await navigator.credentials.get({publicKey:{challenge:rand(32),allowCredentials:[{type:"public-key",id:new Uint8Array(unb64(b.value.credentialId))}],userVerification:"required",timeout:60000,extensions:{prf:{eval:{first:new Uint8Array(unb64(b.value.prfSalt))}}}}});
+  let ext=cred.getClientExtensionResults(),prf=ext.prf&&ext.prf.results&&ext.prf.results.first;if(!prf)throw Error("PRF در این دستگاه در دسترس نیست.");
+  let wrap=await deriveWrapKey(prf,new Uint8Array(unb64(b.value.prfSalt))),raw=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(unb64(b.value.iv))},wrap,unb64(b.value.wrapped));
+  masterKey=await crypto.subtle.importKey("raw",raw,{name:"AES-GCM"},false,["encrypt","decrypt"]);hide("unlock");show("app");await loadRecords();
+ }catch(e){msg("unlockMsg","ورود با اثر انگشت ناموفق بود: "+e.message)}
+}
+async function createVault(){let p=$("newPass").value;if(p.length<10){msg("setupMsg","رمز باید حداقل ۱۰ نویسه باشد.");return}if(p!==$("newPass2").value){msg("setupMsg","تکرار رمز با رمز اصلی یکسان نیست.");return}try{salt=rand(16);masterKey=await derive(p,salt);let check=await encryptBytes(enc.encode("vault-ok-v1"));await putMeta("vault",{salt:b64(salt),check});hide("setup");show("app");await loadRecords()}catch(e){msg("setupMsg","خطا: "+e.message)}}
+async function unlockVault(){let p=$("pass").value;try{let m=await getMeta("vault");salt=new Uint8Array(unb64(m.value.salt));let key=await derive(p,salt);let plain=await crypto.subtle.decrypt({name:"AES-GCM",iv:new Uint8Array(unb64(m.value.check.iv))},key,unb64(m.value.check.data));if(dec.decode(plain)!=="vault-ok-v1")throw Error();masterKey=key;hide("unlock");show("app");$("pass").value="";$("bioUnlockBtn").hidden=!(await getMeta("biometric"));await loadRecords()}catch(e){msg("unlockMsg","رمز اشتباه است یا خزانه قابل خواندن نیست.")}}
+async function lockVault(){masterKey=null;privateKey=null;privateBioOk=false;selectedFolder="همه";records=[];hide("app");show("unlock");$("pass").value="";$("bioUnlockBtn").hidden=!(await getMeta("biometric"))}
+async function exportBackup(){try{let tx=db.transaction([STORE,META],"readonly");let rows=await req(tx,STORE,"getAll"),m=await req(tx,META,"get",{key:"vault"});let pack={format:"PERSONAL-VAULT-BACKUP",version:2,created:new Date().toISOString(),vault:m.value,records:rows};let blob=new Blob([JSON.stringify(pack)],{type:"application/octet-stream"});let a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download="personal-vault-backup-"+new Date().toISOString().slice(0,10)+".vault";a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);msg("backupMsg","فایل پشتیبان ساخته شد. آن را در محل امن نگهداری کن.")}catch(e){msg("backupMsg","خطا در پشتیبان‌گیری: "+e.message)}}
+async function importBackup(file){try{let pack=JSON.parse(await file.text());if(pack.format!=="PERSONAL-VAULT-BACKUP"||![1,2].includes(pack.version)||!pack.vault||!Array.isArray(pack.records))throw Error("ساختار فایل معتبر نیست");if(!confirm("بازیابی، اطلاعات فعلی این مرورگر را با اطلاعات فایل جایگزین می‌کند. ادامه می‌دهی؟"))return;let tx=db.transaction([STORE,META],"readwrite");tx.objectStore(STORE).clear();for(let r of pack.records)tx.objectStore(STORE).put(r);tx.objectStore(META).put({key:"vault",value:pack.vault});masterKey=null;records=[];hide("app");show("unlock");msg("unlockMsg","بازیابی انجام شد. با رمز اصلی همان فایل وارد شو.");msg("backupMsg","بازیابی انجام شد.")}catch(e){msg("backupMsg","بازیابی ناموفق: "+e.message)}}
+async function init(){if(!window.crypto?.subtle||!window.indexedDB){alert("این مرورگر امکانات لازم برای رمزنگاری امن و ذخیره‌سازی را ندارد. از مرورگر به‌روز در محیط امن استفاده کن.");return}try{db=await openDB();let m=await getMeta("vault");if(m){show("unlock");let bio=await getMeta("biometric");$("bioUnlockBtn").hidden=!bio; if(bio){$("unlockMsg").textContent="برای ورود می‌توانی از اثر انگشت یا رمز اصلی استفاده کنی."}}else{show("setup");$("bioUnlockBtn").hidden=true}}catch(e){alert("راه‌اندازی پایگاه داده ناموفق بود: "+e.message)}}
+$("createBtn").onclick=createVault;$("unlockBtn").onclick=unlockVault;$("biometricBtn").onclick=biometricEnroll;$("bioUnlockBtn").onclick=biometricUnlock;$("lockBtn").onclick=lockVault;$("saveBtn").onclick=saveRecord;$("cancelEdit").onclick=resetEditor;$("kind").onchange=updateFields;$("addBtn").onclick=()=>{resetEditor();let k=["login","bank","note","file"].includes(activeTab)?activeTab:"login";$("kind").value=k;updateFields();$("kind").classList.toggle("hidden",activeTab!=="all");$("kindLabel").classList.toggle("hidden",activeTab!=="all");$("editorTitle").textContent="افزودن "+labelKind(k);show("editor");window.scrollTo({top:document.body.scrollHeight,behavior:"smooth"})};$("themeBtn").onclick=()=>{let t=document.documentElement.dataset.theme==="light"?"dark":"light";document.documentElement.dataset.theme=t;localStorage.setItem("pv-theme",t)};let savedTheme=localStorage.getItem("pv-theme");if(savedTheme)document.documentElement.dataset.theme=savedTheme;
+document.querySelectorAll(".nav button").forEach(b=>b.onclick=()=>setTab(b.dataset.tab));$("exportBtn").onclick=exportBackup;$("importBtn").onclick=()=>$("backupFile").click();$("backupFile").onchange=e=>{if(e.target.files[0])importBackup(e.target.files[0]);e.target.value=""};$("fileInput").onchange=e=>{let f=e.target.files[0];$("fileInfo").textContent=f?f.name+" · "+(f.size/1024).toFixed(0)+" KB":"";$("filePreview").innerHTML="";if(f&&f.type.startsWith("image/")){let img=document.createElement("img");img.className="filepreview";img.src=URL.createObjectURL(f);$("filePreview").append(img)}};$("pickSourceFolder").onclick=async()=>{if(typeof window.showDirectoryPicker!=="function"){$("moveInfo").textContent="این مرورگر انتخاب پوشه و حذف مستقیم فایل را پشتیبانی نمی‌کند؛ فایل رمزنگاری می‌شود اما نسخه اصلی باید دستی حذف شود.";return}try{sourceDirectoryHandle=await window.showDirectoryPicker({mode:"readwrite"});$("moveInfo").textContent="پوشه مبدأ انتخاب شد. پس از ذخیره موفق، برای تطبیق فایل و تأیید نهایی حذف اقدام می‌شود."}catch(e){sourceDirectoryHandle=null;$("moveInfo").textContent="انتخاب پوشه لغو شد؛ فایل اصلی حذف نخواهد شد."}};$("secureMove").onchange=()=>{if($("secureMove").checked&&typeof window.showDirectoryPicker!=="function")$("moveInfo").textContent="این مرورگر حذف مستقیم از پوشه را پشتیبانی نمی‌کند؛ ذخیره رمزنگاری‌شده انجام می‌شود ولی حذف اصلی باید دستی باشد."};$("closePhoto").onclick=closePhoto;$("photoModal").onclick=e=>{if(e.target.id==="photoModal")closePhoto()};$("downloadPhoto").onclick=()=>{if(currentPhotoRecord)downloadRecordFile(currentPhotoRecord)};$("privateBioBtn").onclick=verifyPrivateBiometric;$("privateOpenBtn").onclick=setupOrOpenPrivate;$("privateCancelBtn").onclick=()=>{hide("privateGate");selectedFolder="همه";privateKey=null;render()};$("addFolderBtn").onclick=()=>{let n=$("newFolderName").value.trim();if(!n||n==="Private"||folderNames.includes(n)){alert("نام پوشه نامعتبر یا تکراری است.");return}folderNames.push(n);$("folderSelect").add(new Option(n,n));$("folderSelect").value=n;$("newFolderName").value="";putMeta("folders",folderNames).catch(()=>{});};
+let deferredInstall=null;$("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true};window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false});window.addEventListener("appinstalled",()=>{$("installBtn").hidden=true});
+if("serviceWorker" in navigator && (location.protocol==="https:"||location.hostname==="localhost")){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(e=>console.warn("SW registration",e)))}
+init();
+})();
+</script>
+</body></html>
